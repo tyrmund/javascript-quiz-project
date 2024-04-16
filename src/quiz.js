@@ -29,15 +29,17 @@ class Quiz {
 
     }
 
-    checkAnswer(answer) {
-        if (answer === this.questions[this.currentQuestionIndex].answer) {
+    checkAnswer(answerToCheck) {
+        const currentQuestion = this.getQuestion()
+        const currentAnswer = currentQuestion.answer
+
+        if (answerToCheck === currentAnswer) {
             this.correctAnswers++
         }
     }
 
     hasEnded() {
-        if (this.currentQuestionIndex < this.questions.length)
-            return false
+        if (this.currentQuestionIndex < this.questions.length) return false
         else return true
     }
 
