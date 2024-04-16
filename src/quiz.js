@@ -44,19 +44,25 @@ class Quiz {
     }
 
     filterQuestionsByDifficulty(difficulty) {
-        if (difficulty >= 1 && difficulty <= 3) {
-            this.questions = this.questions.filter((question) => {
-                question.difficulty === difficulty
-            })
+
+
+        const filteredQuestions = this.questions.filter(eachQuestion => {
+            return eachQuestion.difficulty === difficulty
+        })
+
+        if (filteredQuestions.length !== 0) {
+            this.questions = filteredQuestions
         }
+
 
     }
 
     averageDifficulty() {
-        let totalDifficulty = 0
-        this.questions.forEach(element => {
-            totalDifficulty += element.difficulty
-        })
+
+        const totalDifficulty = this.questions.reduce((acc, question) => {
+            return acc + question.difficulty
+        }, 0)
+
         return totalDifficulty / this.questions.length
     }
 }
