@@ -45,15 +45,15 @@ class Quiz {
 
     filterQuestionsByDifficulty(difficulty) {
 
+        if (isNaN(difficulty) || !(difficulty >= 1 && difficulty <= 3) || !(typeof difficulty === 'number')) {
+            return
+        }
 
         const filteredQuestions = this.questions.filter(eachQuestion => {
             return eachQuestion.difficulty === difficulty
         })
 
-        if (filteredQuestions.length !== 0) {
-            this.questions = filteredQuestions
-        }
-
+        this.questions = filteredQuestions
 
     }
 
