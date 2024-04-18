@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     new Question("Who created JavaScript?", ["Plato", "Brendan Eich", "Lea Verou", "Bill Gates"], "Brendan Eich", 2),
     new Question("What is the mass–energy equivalence equation?", ["E = mc^2", "E = m*c^2", "E = m*c^3", "E = m*c"], "E = mc^2", 3),
   ];
-  const quizDuration = 120; // 120 seconds (2 minutes)
+  const quizDuration = 10; // 120 seconds (2 minutes)
 
 
   /************  QUIZ INSTANCE  ************/
@@ -46,21 +46,36 @@ document.addEventListener("DOMContentLoaded", () => {
   /************  SHOW INITIAL CONTENT  ************/
 
   // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
-  const minutes = Math.floor(quiz.timeRemaining / 60).toString().padStart(2, "0");
-  const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+
+  function timeConverter(time) {
+    const minutes = Math.floor(time / 60).toString().padStart(2, "0");
+    const seconds = (time % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`
+  }
 
   // Display the time remaining in the time remaining container
   const timeRemainingContainer = document.getElementById("timeRemaining");
-  timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  timeRemainingContainer.innerText = timeConverter(quiz.timeRemaining);
 
   // Show first question
   showQuestion();
 
-
   /************  TIMER  ************/
 
-  let timer;
+  function startTimer() {
 
+    let timerID = setInterval(() => {
+      quiz.timeRemaining--
+      timeRemainingContainer.innerHTML = timeConverter(quiz.timeRemaining)
+      if (quiz.timeRemaining === 0) {
+        clearInterval(timerID)
+        showResults()
+      }
+    }, 1000)
+
+  }
+
+  startTimer()
 
   /************  EVENT LISTENERS  ************/
 
@@ -104,8 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Update the green progress bar
     // Update the green progress bar (div#progressBar) width so that it shows the percentage of questions answered
 
-    let totalQuestions = questions.length
-    let currentQuestion = (questions.indexOf(question))
+    let totalQuestions = quiz.questions.length
+    let currentQuestion = (quiz.questions.indexOf(question))
 
     let currentProgress = currentQuestion / totalQuestions * 100
 
@@ -115,9 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Update the question count text 
     // Update the question count (div#questionCount) show the current question out of total questions
 
-    questionCount.innerText = `Question ${currentQuestion} of ${totalQuestions}`; //  This value is hardcoded as a placeholder
-
-
+    questionCount.innerText = `Question ${currentQuestion + 1} of ${totalQuestions}`; //  This value is hardcoded as a placeholder
 
     // 4. Create and display new radio input element with a label for each choice.
     // Loop through the current question `choices`.
@@ -132,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     question.choices.forEach(choice => {
 
       let newInput = document.createElement('input')
-      newInput.type = 'radio'
+      newInput.type = 'radio' // también newInput.setAttribute('type','radio')
       newInput.name = 'choice'
       newInput.value = `${choice}`
 
@@ -166,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //
     // 1. Get all the choice elements. You can use the `document.querySelectorAll()` method.
 
-    let currentChoices = document.querySelectorAll('input')
+    let currentChoices = document.querySelectorAll('#choices input') //'#choices input' seria más excluyente y seguro
 
     // 2. Loop through all the choice elements and check which one is selected
     // Hint: Radio input elements have a property `.checked` (e.g., `element.checked`).
@@ -206,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     endView.style.display = "flex";
 
     // 3. Update the result container (div#result) inner text to show the number of correct answers out of total questions
-    resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${questions.length} correct answers!`; // This value is hardcoded as a placeholder
+    resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`; // This value is hardcoded as a placeholder
   }
 
   function restartQuiz() {
@@ -214,9 +227,13 @@ document.addEventListener("DOMContentLoaded", () => {
     endView.style.display = 'none'
     quizView.style.display = 'block'
     quiz.shuffleQuestions()
+    quiz.timeRemaining = 120
+    timeRemainingContainer.innerHTML = timeConverter(quiz.timeRemaining)
+    startTimer()
     quiz.currentQuestionIndex = 0
     quiz.correctAnswers = 0
     showQuestion()
+
   }
 
 });
